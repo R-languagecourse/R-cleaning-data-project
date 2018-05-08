@@ -1,0 +1,172 @@
+---
+title: "README"
+author: "kieran cagney"
+date: "May 08, 2018"
+output: html_document
+---
+
+Getting and Cleaning Data Course Projectless 
+The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis. You will be graded by your peers on a series of yes/no questions related to the project. You will be required to submit: 1) a tidy data set as described below, 2) a link to a Github repository with your script for performing the analysis, and 3) a code book that describes the variables, the data, and any transformations or work that you performed to clean up the data called CodeBook.md. You should also include a README.md in the repo with your scripts. This repo explains how all of the scripts work and how they are connected.
+
+One of the most exciting areas in all of data science right now is wearable computing - see for example this article . Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained:
+
+http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+
+Here are the data for the project:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+
+You should create one R script called run_analysis.R that does the following.
+
+Merges the training and the test sets to create one data set.
+Extracts only the measurements on the mean and standard deviation for each measurement.
+Uses descriptive activity names to name the activities in the data set
+Appropriately labels the data set with descriptive variable names.
+From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.  
+
+
+Data Set Information:
+
+The experiments have been carried out with a group of 30 volunteers within an age bracket of 19-48 years. Each person performed six activities (WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING) wearing a smartphone (Samsung Galaxy S II) on the waist. Using its embedded accelerometer and gyroscope, we captured 3-axial linear acceleration and 3-axial angular velocity at a constant rate of 50Hz. The experiments have been video-recorded to label the data manually. The obtained dataset has been randomly partitioned into two sets, where 70% of the volunteers was selected for generating the training data and 30% the test data. 
+
+The sensor signals (accelerometer and gyroscope) were pre-processed by applying noise filters and then sampled in fixed-width sliding windows of 2.56 sec and 50% overlap (128 readings/window). The sensor acceleration signal, which has gravitational and body motion components, was separated using a Butterworth low-pass filter into body acceleration and gravity. The gravitational force is assumed to have only low frequency components, therefore a filter with 0.3 Hz cutoff frequency was used. From each window, a vector of features was obtained by calculating variables from the time and frequency domain.
+
+Check the README.txt file for further details about this dataset. 
+
+A video of the experiment including an example of the 6 recorded activities with one of the participants can be seen in the following link: [Web Link]
+
+An updated version of this dataset can be found at [Web Link]. It includes labels of postural transitions between activities and also the full raw inertial signals instead of the ones pre-processed into windows.
+
+
+Attribute Information:
+
+For each record in the dataset it is provided: 
+- Triaxial acceleration from the accelerometer (total acceleration) and the estimated body acceleration. 
+- Triaxial Angular velocity from the gyroscope. 
+- A 561-feature vector with time and frequency domain variables. 
+- Its activity label. 
+- An identifier of the subject who carried out the experiment.
+
+
+#Dowload the data
+
+
+
+
+```{r, eval = FALSE}
+if(!file.exists("./data")){dir.create("./data")}
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+download.file(fileUrl,destfile="./data/Dataset.zip")
+
+###Unzip it into a data directory
+unzip(zipfile="./data/Dataset.zip",exdir="./data")
+```
+
+
+#The files in folder 'UCI HAR Dataset' that we are interested in are
+
+1. features.txt - Names of column variables in the dataTable
+2. activity_labels.txt - Links the class labels with their activity name.
+3. SUBJECT FILES
+  + test/subject_test.txt
+  + train/subject_train.txt
+4. ACTIVITY FILES
+  + test/X_test.txt
+  + train/X_train.txt
+5. DATA FILES
+  +test/y_test.txt
+  +train/y_train.txt
+
+
+# Read the data files into a set of data frames
+
+
+Glue seperately the test and train subcomponent dataframes with "data.frame"
+and glue the reassembled df_train and df_test dataframes together with rbind 
+
+```{r, eval = FALSE}
+features <- read.csv('./features.txt', header = FALSE, sep = ' ')
+### Make a vector of strings from the dataframe
+features <- as.character(features[,2])
+
+### Could use read.csv rather than read.table, but this file is rather big
+df_train_X <- read.table('./train/X_train.txt')
+df_train_Y <- read.csv('./train/y_train.txt', header = FALSE, sep = ' ')
+df_train_subject <- read.csv('./train/subject_train.txt',header = FALSE, sep = ' ')
+
+df_train <-  data.frame(df_train_subject, df_train_Y, df_train_X)
+start_of_vector <- c('subject', 'activity')
+names(df_train) <- append ( start_of_vector,  features)
+
+### Could use read.csv rather than read.table, but this file is rather big
+df_test_X <- read.table('./test/X_test.txt')
+df_test_Y <- read.csv('./test/y_test.txt', header = FALSE, sep = ' ')
+df_test_subject <- read.csv('./test/subject_test.txt', header = FALSE, sep = ' ')
+
+df_test <-  data.frame(df_test_subject, df_test_Y, df_test_X)
+names(df_test) <- append ( start_of_vector,  features)
+
+df_all <- rbind(df_train, df_test)
+```  
+
+
+
+# Pull out the mean and standard deviation with good old grep
+
+
+
+```{r, eval = FALSE}
+### Do a grep from the features vector, then we know the positions to pull from, but add 2 as 
+### Subject and activity is prepended at the begining
+
+col_select <- grep('mean|std', features)
+data_sub <- df_all[,c(1,2,col_select + 2)]
+
+
+``` 
+
+
+# Use the descriptive activity names for the data set
+
+```{r, eval = FALSE}
+activity_labels <- read.csv('./activity_labels.txt', header = FALSE, sep = ' ')
+activity_labels <- as.character(activity_labels[,2])
+data_sub$activity <- activity_labels[data_sub$activity]
+
+```
+
+
+#Relable the data set with properly descriptive name 
+
+use gsub in all it's glory to perform this activity
+
+```{r, eval = FALSE}
+descriptive_name <- names(data_sub)
+descriptive_name <- gsub("[(][)]", "", descriptive_name)
+## change the pattern "Acc" to "Accelerometer"
+descriptive_name <- gsub("Acc", "Accelerometer", descriptive_name)
+## change the patterm "Gyro" to "Gyroscope"
+descriptive_name <- gsub("Gyro", "Gyroscope", descriptive_name)
+## change the pattern "Mag" to "Magnitude"
+descriptive_name <- gsub("Mag", "Magnitude", descriptive_name)
+## t at the begining is TimeDomain so replace
+descriptive_name <- gsub("^t", "TimeDomain_", descriptive_name)
+## f at the begining is FrequencyDomain_ so replace
+descriptive_name <- gsub("^f", "FrequencyDomain_", descriptive_name)
+## all underscores now and "-mean-" is "_Mean_" for readability, the _ is needed to avoid other matches
+descriptive_name <- gsub("-mean-", "_Mean_", descriptive_name)
+## -std- becomes _StandardDeviation_
+descriptive_name <- gsub("-std-", "_StandardDeviation_", descriptive_name)
+## All underscores now
+descriptive_name <- gsub("-", "_", descriptive_name)
+names(data_sub) <- descriptive_name
+```
+
+
+#Output the tidy dataframe to a file
+
+
+```{r, eval = FALSE}
+tidy_data <- aggregate(data_sub[,3:81], by = list(activity = data_sub$activity, subject = data_sub$subject),FUN = mean)
+write.table(x = tidy_data, file = "tidy_data.txt", row.names = FALSE)
+```
