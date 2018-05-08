@@ -1,0 +1,50 @@
+---
+title: "Codebook"
+Author: "kieran Cagney"
+output: html_document
+---
+
+
+
+Reads In Files From The UCI HAR Dataset
+
+Sorts out the column headers
+
+Merges and subsets the dataframes
+
+relabels the variables according to instructions
+
+Outputs the tidy file
+
+
+##This is an explanation of all the variables in run_analysis.R 
+
+
+
+df_train_X: datafram from X_train.txt
+df_train_Y: data fram from y_train.txt
+df_train_subject: data frame from subject_train.txt
+
+df_train: merged 3 dataframes above
+
+
+df_test_X: dataframe from X_test.txt
+df_test_Y: dataframe from test/y_test.txt
+df_test_subject: dataframe from subject_test.txt
+
+df_test: merged 3 dataframes above
+
+
+
+df_all: df_train and df_test merged
+
+
+
+col_select: vector of colume numbers with mean and std
+
+
+activity_labels: vector of the activities lables
+
+descriptive_name: the lables from the combined dataframe
+
+tidy_data: the final dataframe
