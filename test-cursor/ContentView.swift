@@ -11,7 +11,7 @@ struct ContentView: View {
     var body: some View {
         VStack {
             ZStack(alignment: .top) {
-                Text("Fridge me")
+                Text("Fridge-it")
                     .font(.largeTitle)
                 HStack {
                     Spacer()
