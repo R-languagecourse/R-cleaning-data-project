@@ -10,19 +10,36 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
-            Image(systemName: "refrigerator.fill")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            ZStack(alignment: .top) {
+                Text("Fridge me")
+                    .font(.largeTitle)
+                HStack {
+                    Spacer()
+                    Image(systemName: "bell.fill")
+                        .font(.title2)
+                        .foregroundStyle(.tint)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.top)
 
             Spacer()
 
-            HStack(spacing: 8) {
+            VStack(spacing: 12) {
+                Image(systemName: "refrigerator.fill")
+                    .font(.system(size: 112))
+                    .foregroundStyle(.tint)
+                    .frame(width: 120)
+                Text("my fridge")
+            }
+
+            Spacer()
+
+            VStack(spacing: 12) {
                 Image(systemName: "camera.fill")
-                    .imageScale(.large)
+                    .font(.system(size: 112))
+                    .foregroundStyle(.tint)
+                    .frame(width: 120)
                 Text("fill the fridge")
             }
             .padding()
