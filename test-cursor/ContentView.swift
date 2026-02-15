@@ -17,6 +17,15 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+
+            Spacer()
+
+            HStack(spacing: 8) {
+                Image(systemName: "camera.fill")
+                    .imageScale(.large)
+                Text("fill the fridge")
+            }
+            .padding()
         }
         .padding()
     }
