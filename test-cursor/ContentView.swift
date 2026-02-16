@@ -14,6 +14,12 @@ struct ContentView: View {
                 Text("Fridge-it")
                     .font(.largeTitle)
                 HStack {
+                    Image(systemName: "person.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.tint)
+                    Spacer()
+                }
+                HStack {
                     Spacer()
                     Image(systemName: "bell.fill")
                         .font(.title2)
